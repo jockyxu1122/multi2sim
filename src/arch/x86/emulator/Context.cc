@@ -391,6 +391,11 @@ void Context::Load(const std::vector<std::string> &args,
 	assert(!memory.get());
 	memory = misc::new_shared<mem::Memory>();
 
+	std::fstream out_file;
+	out_file.open("trainingData.txt", std::ios_base::app);
+	out_file << "\nNext program:\n\n";
+	out_file.close();
+
 	// Loading a context from an executable file creates a new virtual
 	// address space within the context's associated MMU.
 	assert(!mmu_space);

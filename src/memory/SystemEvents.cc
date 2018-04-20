@@ -17,6 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include <fstream>
 #include <network/EndNode.h>
 
 #include "Frame.h"
@@ -1153,6 +1154,21 @@ void System::EventFindAndLockHandler(esim::Event *event,
 		if (frame->write && frame->hit && frame->witness)
 			(*frame->witness)++;
 
+		/*
+			Open file for appending (only l2 cache related data is logged).
+			Format:
+			<cache name> <cache hit/miss (1/0)> <tag(address)> <set(index)> <way(offset)>
+		*/
+		std::ofstream out_file;
+		out_file.open("trainingData.txt", std::ios_base::app);
+
+		// Determine if current module is L2 shared cache.
+		const std::string module_name = module->getName().c_str();
+		const bool is_l2_cache = module_name.find("l2") != std::string::npos;
+		if (is_l2_cache) {
+			out_file << module_name << " ";
+		}
+
 		// Check if miss
 		if (!frame->hit)
 		{
@@ -1176,8 +1192,25 @@ void System::EventFindAndLockHandler(esim::Event *event,
 			// Find a victim to evict, only in up-down accesses.
 			assert(!frame->way);
 			frame->way = cache->ReplaceBlock(frame->set);
+
+			// 0 represents cache miss.
+			if (is_l2_cache) {
+				out_file << "0 ";
+			}
+		} else {
+			// 1 represents cache hit.
+			if (is_l2_cache) {
+				out_file << "1 ";
+			}
 		}
+
 		assert(frame->way >= 0);
+
+		// Log cache tag, set, and way.
+		if (is_l2_cache) {
+			out_file << frame->getId() << " " << frame->getAddress() << " " << frame->tag << " " << frame->set << " " << frame->way << " " << frame->state << "\n";
+		}
+		out_file.close();
 
 		// If directory entry is locked and the call to find-and-lock
 		// is not blocking, release port and return error.
