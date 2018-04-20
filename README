@@ -1,47 +1,41 @@
-# NN_cache_replacement
+Welcome to Multi2sim 5.0
 
-### Preparation:
+Multi2sim is a simulator of CPUs and GPUs, used to test and validate new hardware designs before
+they are physically manufactured. By running a set of standard benchmarks on Multi2Sim, a computer
+architect can verify whether a proposed alternative design is correct, and what its relative
+performance is over existing designs.
 
-  - Replace `System.Events.cc` under `multi2sim/src/memory`.
-  - Replace `Context.cc` under `multi2sim/src/arch/x86/emulator`.
-  - Put `mem-config` under `multi2sim/samples/x86/example-x`.
-  - Modify `x86-config.ini` with desired cores and threads.
+Multi2sim 5.0 code is maintained in Github, and TopOfTrees (www.topoftrees.com).
+We use Github reporting bugs and issuing requests.
+We use TopOfTrees as a forum for discussions, code review, and development. TopOfTrees implements
+the Agile software development Model.
 
-### To run:
-```sh
-$ cd multi2sim
-$ make
-$ rm -f trainingData.txt
-$ cd <one of the bechmark folders>
-$ m2s --x86-config x86-config.ini --x86-sim detailed --ctx-config ctx-config.ini
-```
+Installation:
 
-## Important!
-Remember to do:
-```sh
-rm -f trainingData.txt
-```
-before running, since the code merely appends lines at EOF of _trianingData.txt_.
+In order to install Multi2sim on Ubuntu 14.04 and 15.04 run the following commands:
 
-### trainingData.txt
-  - Each program is separated by `\nNext program:\n\n`.
-  - Only L2 shared cache related data is logged.
-  - Format:
-  
-    __\<cache name> \<cache hit(1)/miss(0)> \<cache id> \<cache address> \<cache tag> \<cache set(index)> \<cache way(offset)> \<cache state>__
-  - Cache state map:
-    {
+$> libtoolize
+$> aclocal
+$> autoconf
+$> automake --add-missing
+$> ./configure
+$> make
 
-      { "N", BlockNonCoherent },
+For other platforms such as Mac OS and Windows (and for now, Ubuntu 16.04) you can use our up to
+date image on docker. For that you require to have docker installed on your machine. 
+The instructions to install docker can be found in: https://docs.docker.com/engine/installation/
 
-      { "M", BlockModified },
+After installing the docker, you can pull the image of the Multi2sim's master branch with the
+following command:
 
-      { "O", BlockOwned },
+(in the docker terminal)
+$> docker pull multi2sim/multi2sim
 
-      { "E", BlockExclusive },
+$> docker run -it multi2sim/multi2sim bash
 
-      { "S", BlockShared },
+The head of the master branch of Multi2sim 5.0 is automatically compiled and installed on the 
+filesystem of the downloaded image, and you can simply run Multi2sim:
 
-      { "I", BlockInvalid }
+$> m2s
 
-    }
+
